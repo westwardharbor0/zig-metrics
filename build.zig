@@ -1,25 +1,27 @@
-const Builder = @import("std").build.Builder;
+const std = @import("std");
 
-pub fn build(b: *Builder) void {
-    const mode = b.standardReleaseOptions();
-    const lib = b.addStaticLibrary("graph", "src/graph.zig");
-    lib.setBuildMode(mode);
+pub fn build(b: *std.Build) void {
+    const target = b.standardTargetOptions(.{});
+    const optimize = b.standardOptimizeOption(.{});
 
-    var main_tests = b.addTest("src/graph.zig");
-    main_tests.setBuildMode(mode);
+    const lib = b.addSharedLibrary(.{
+        .name = "zig-metrics",
+        .root_source_file = b.path("src/metrics.zig"),
+        .target = target,
+        .optimize = optimize,
+        .version = .{ .major = 1, .minor = 2, .patch = 3 },
+    });
 
+    var main_tests = b.addTest(.{
+        .name = "tests",
+        .root_source_file = b.path("src/test.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
     const test_step = b.step("test", "Run library tests");
     test_step.dependOn(&main_tests.step);
 
-    b.default_step.dependOn(&lib.step);
-    b.installArtifact(lib);
+    b.default_step.dependOn(test_step);
 
-    //const lib = b.addStaticLibrary(.{
-    //    .name = "zouter",
-    // In this case the main source file is merely a path, however, in more
-    // complicated build scripts, this could be a generated file.
-    //    .root_source_file = b.path("src/root.zig"),
-    //    .target = target,
-    //    .optimize = optimize,
-    //});
+    b.installArtifact(lib);
 }

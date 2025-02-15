@@ -1,5 +1,12 @@
 # zig-metrics
-Zig prometheus metrics
+Prometheus metrics implemented using "Zig" and imagination.
+
+Using ArenaAllocator to store all the heap data. 
+
+# Install 
+
+# Usage 
+
 
 ```zig
 

@@ -202,22 +202,15 @@ pub const Histogram = struct {
     }
 
     pub fn observe(self: *@This(), labelValues: anytype, amount: f64) !void {
-        var added = false;
-
         self.count += 1;
         self.sum += amount;
 
         for (self.buckets.items) |bucketVal| {
-            if (bucketVal > amount) {
+            if (bucketVal >= amount) {
                 const sVal = try std.fmt.allocPrint(self.nm.allocator, "{d}", .{bucketVal});
                 defer self.nm.allocator.free(sVal);
                 try self.incLens(labelValues, sVal, 1);
-                added = true;
             }
-        }
-
-        if (added) {
-            return;
         }
 
         try self.incLens(labelValues, "+Inf", 1);
