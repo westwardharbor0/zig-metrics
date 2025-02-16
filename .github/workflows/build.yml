@@ -1,0 +1,20 @@
+name: Build
+
+on:
+  push:
+    branches: [ "main" ]
+    paths:
+      - '**.zig'
+  pull_request:
+    branches: [ "main" ]
+    paths:
+      - '**.zig'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    name: Build & Release
+    steps:
+      - uses: mlugg/setup-zig@v1
+        with:
+          version: 0.14.0
