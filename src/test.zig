@@ -66,7 +66,6 @@ test "counter metric non-string label value provided" {
         metrics.MetricError.LabelValuesNotStringArray,
         c.inc(.{1}, 1),
     );
-
     try testing.expectError(
         metrics.MetricError.LabelValuesNotStringArray,
         c.inc(1, 1),
@@ -79,53 +78,53 @@ test "gauge metric label add" {
     const ta = testing.allocator;
     var arena = heap.ArenaAllocator.init(ta);
     defer arena.deinit();
-    var c = metrics.Gauge.init(arena.allocator(), "test_gauge", "Test gauge desc");
-    try c.addLabel("hostname");
-    try testing.expectEqual(c.nm.labelNames.items.len, 1);
-    try c.addLabel("domain");
-    try testing.expectEqual(c.nm.labelNames.items.len, 2);
+    var g = metrics.Gauge.init(arena.allocator(), "test_gauge", "Test gauge desc");
+    try g.addLabel("hostname");
+    try testing.expectEqual(g.nm.labelNames.items.len, 1);
+    try g.addLabel("domain");
+    try testing.expectEqual(g.nm.labelNames.items.len, 2);
 }
 
 test "gauge metric value inc recorded for labels" {
     const ta = testing.allocator;
     var arena = heap.ArenaAllocator.init(ta);
     defer arena.deinit();
-    var c = metrics.Gauge.init(arena.allocator(), "test_gauge", "Test gauge desc");
-    try c.addLabel("hostname");
-    try c.addLabel("ip");
-    try c.inc(.{ "test.hostname", "1.1.1.1" }, 1);
-    try c.inc(.{ "test.hostname", "1.1.1.2" }, 1);
-    try testing.expectEqual(c.nm.labelMap.get("test.hostname|1.1.1.1"), 1);
-    try testing.expectEqual(c.nm.labelMap.get("test.hostname|1.1.1.2"), 1);
+    var g = metrics.Gauge.init(arena.allocator(), "test_gauge", "Test gauge desc");
+    try g.addLabel("hostname");
+    try g.addLabel("ip");
+    try g.inc(.{ "test.hostname", "1.1.1.1" }, 1);
+    try g.inc(.{ "test.hostname", "1.1.1.2" }, 1);
+    try testing.expectEqual(g.nm.labelMap.get("test.hostname|1.1.1.1"), 1);
+    try testing.expectEqual(g.nm.labelMap.get("test.hostname|1.1.1.2"), 1);
 }
 
 test "gauge metric value set recorded for labels" {
     const ta = testing.allocator;
     var arena = heap.ArenaAllocator.init(ta);
     defer arena.deinit();
-    var c = metrics.Gauge.init(arena.allocator(), "test_gauge", "Test gauge desc");
-    try c.addLabel("hostname");
-    try c.addLabel("ip");
-    try c.inc(.{ "test.hostname", "1.1.1.1" }, 2);
-    try c.inc(.{ "test.hostname", "1.1.1.1" }, 2);
-    try testing.expectEqual(c.nm.labelMap.get("test.hostname|1.1.1.1"), 4);
-    try c.set(.{ "test.hostname", "1.1.1.1" }, 13);
-    try testing.expectEqual(c.nm.labelMap.get("test.hostname|1.1.1.1"), 13);
-    try c.set(.{ "test.hostname", "1.1.1.55" }, 3);
-    try testing.expectEqual(c.nm.labelMap.get("test.hostname|1.1.1.55"), 3);
+    var g = metrics.Gauge.init(arena.allocator(), "test_gauge", "Test gauge desc");
+    try g.addLabel("hostname");
+    try g.addLabel("ip");
+    try g.inc(.{ "test.hostname", "1.1.1.1" }, 2);
+    try g.inc(.{ "test.hostname", "1.1.1.1" }, 2);
+    try testing.expectEqual(g.nm.labelMap.get("test.hostname|1.1.1.1"), 4);
+    try g.set(.{ "test.hostname", "1.1.1.1" }, 13);
+    try testing.expectEqual(g.nm.labelMap.get("test.hostname|1.1.1.1"), 13);
+    try g.set(.{ "test.hostname", "1.1.1.55" }, 3);
+    try testing.expectEqual(g.nm.labelMap.get("test.hostname|1.1.1.55"), 3);
 }
 
 test "gauge metric value dec recorded for labels" {
     const ta = testing.allocator;
     var arena = heap.ArenaAllocator.init(ta);
     defer arena.deinit();
-    var c = metrics.Gauge.init(arena.allocator(), "test_gauge", "Test gauge desc");
-    try c.addLabel("hostname");
-    try c.addLabel("ip");
-    try c.set(.{ "test.hostname", "1.1.1.1" }, 22);
-    try testing.expectEqual(c.nm.labelMap.get("test.hostname|1.1.1.1"), 22);
-    try c.set(.{ "test.hostname", "1.1.1.1" }, 13);
-    try testing.expectEqual(c.nm.labelMap.get("test.hostname|1.1.1.1"), 13);
+    var g = metrics.Gauge.init(arena.allocator(), "test_gauge", "Test gauge desc");
+    try g.addLabel("hostname");
+    try g.addLabel("ip");
+    try g.set(.{ "test.hostname", "1.1.1.1" }, 22);
+    try testing.expectEqual(g.nm.labelMap.get("test.hostname|1.1.1.1"), 22);
+    try g.set(.{ "test.hostname", "1.1.1.1" }, 13);
+    try testing.expectEqual(g.nm.labelMap.get("test.hostname|1.1.1.1"), 13);
 }
 
 // ----------- Histogram tests --------------
@@ -173,6 +172,7 @@ test "histogram metric value observe recorded for labels" {
 
 test "registry register metric" {
     const ta = testing.allocator;
+
     var arena = heap.ArenaAllocator.init(ta);
     defer arena.deinit();
 
@@ -209,5 +209,7 @@ test "registry register metric" {
         \\
         \\
     ;
-    try testing.expectEqualStrings(expected, try r.write());
+    const resp = try r.write();
+    defer arena.allocator().free(resp);
+    try testing.expectEqualStrings(expected, resp);
 }

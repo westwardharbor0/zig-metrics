@@ -118,7 +118,7 @@ const NumberMetric = struct {
             );
         }
 
-        return arrList.items;
+        return arrList.items[0 .. arrList.items.len - 1];
     }
 
     fn keyInc(self: *@This(), key: []const u8, amount: f64) !void {
