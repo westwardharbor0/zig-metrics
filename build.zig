@@ -9,7 +9,7 @@ pub fn build(b: *std.Build) void {
         .root_source_file = b.path("src/metrics.zig"),
         .target = target,
         .optimize = optimize,
-        .version = .{ .major = 1, .minor = 2, .patch = 3 },
+        .version = .{ .major = 0, .minor = 9, .patch = 0 },
     });
 
     var main_tests = b.addTest(.{
