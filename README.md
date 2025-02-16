@@ -5,6 +5,20 @@ Using ArenaAllocator to store all the heap data.
 
 # Install 
 
+Fetch the module.
+```
+zig fetch --save "git+https://github.com/westwardharbor0/zig-metrics#v0.9.1"
+```
+Add to your `build.zig` 
+```rust
+const zig_metrics = b.dependency("zig-metrics", .{
+    .target = target,
+    .optimize = optimize,
+});
+
+exe.root_module.addImport("zig-metrics", zig_metrics.module("zig-metrics"));
+```
+
 # Usage 
 
 Metrics can be used separately as independent units or grouped to a registry. 
