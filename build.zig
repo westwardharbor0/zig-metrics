@@ -12,6 +12,13 @@ pub fn build(b: *std.Build) void {
         .version = .{ .major = 0, .minor = 9, .patch = 0 },
     });
 
+    const m = b.addModule("metrics", .{
+        .root_source_file = b.path("src/metrics.zig"),
+        .target = target,
+        .optimize = optimize,
+    });
+    m.linkLibrary(lib);
+
     var main_tests = b.addTest(.{
         .name = "tests",
         .root_source_file = b.path("src/test.zig"),
